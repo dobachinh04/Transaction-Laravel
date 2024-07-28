@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->date('order_date');
             $table->double('total', 8, 2);
             $table->timestamps();
 

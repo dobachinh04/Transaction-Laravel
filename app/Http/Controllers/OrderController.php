@@ -12,7 +12,9 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $orders = Order::with(['customers, details'])->latest('id')->paginate(5);
+
+        return view('admin.index', compact('orders'));
     }
 
     /**
@@ -20,7 +22,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.create');
     }
 
     /**
@@ -28,7 +30,9 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $image = [];
+
+
     }
 
     /**
