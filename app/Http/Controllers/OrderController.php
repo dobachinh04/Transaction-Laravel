@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
@@ -107,15 +108,57 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+        $order->load(['customer', 'details']);
+
+        return view('admin.edit', compact('order'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-        //
+
+        $images = [];
+
+        try {
+            DB::transaction(function () use ($order, $request, &$images) {
+                // $order->details()->sync($request->order_details);
+
+                foreach ($request->order_details as $productId => $details) {
+                    $order->details()->updateExistingPivot($productId, [
+                        'quantity' => $details['quantity'],
+                        'price' => $details['price']
+                    ]);
+
+                    // Cập nhật tên sản phẩm trong bảng products
+                    Product::where('id', $productId)->update(['name' => $details['name']]);
+
+                    // // Cập nhật ảnh sản phẩm nếu có file mới
+                    // $images[] = $details['image'] = Storage::put('products', $request->file("order_details.$productId.image"));
+
+                    // // Xóa ảnh cũ
+                    // $oldImage = Product::find($productId)->image;
+                    // if ($oldImage && Storage::exists($oldImage)) {
+                    //     Storage::delete($oldImage);
+                    // }
+                }
+
+                $orderDetail = array_map(function ($item) {
+                    return $item['price'] * $item['quantity'];
+                }, $request->order_details);
+
+                $total = array_sum($orderDetail);
+
+                $order->update([
+                    'total' => $total
+                ]);
+            }, 3);
+
+            return back()->with('success', "Cập Nhật Thành Công!");
+        } catch (Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -123,6 +166,16 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        try {
+            DB::transaction(function () use ($order) {
+                $order->details()->sync([]);
+
+                $order->delete();
+            }, 3);
+
+            return back()->with('success', "Xóa Thành Công");
+        } catch (Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 }

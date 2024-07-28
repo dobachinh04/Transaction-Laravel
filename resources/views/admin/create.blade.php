@@ -108,7 +108,7 @@
                             <th scope="col">Mô Tả</th>
                             <th scope="col">Giá</th>
                             <th scope="col">Hàng Tồn</th>
-                            <th scope="col">Số Lượng</th>
+                            <th scope="col">Số Lượng Bán</th>
                         </tr>
                     </thead>
                     <tbody>

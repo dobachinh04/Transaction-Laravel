@@ -51,8 +51,8 @@
                                     <li>Giá: {{ number_format($detail->pivot->price) }}</li>
                                     <li>Số Lượng: {{ $detail->pivot->quantity }}</li>
                                     {{-- @if ($detail->image && \Storage::exists($detail->image)) --}}
-                                        <li><img width="150px" src="{{ asset('storage/' . $detail->image) }}" alt="Ảnh">
-                                        </li>
+                                    <li><img width="150px" src="{{ asset('storage/' . $detail->image) }}" alt="Ảnh">
+                                    </li>
                                     {{-- @endif --}}
                                 </ul>
                             @endforeach
@@ -62,8 +62,14 @@
                         <td>{{ $order->updated_at }}</td>
 
                         <td>
-                            <a href="" class="btn btn-warning">Sửa</a>
-                            <button class="btn btn-danger">Xóa</button>
+                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-warning">Sửa</a>
+                            <form action="{{ route('orders.destroy', $order) }}" method="POST">
+                                @method('DELETE')
+                                @csrf
+
+                                <button onclick="return confirm('Bạn có chắc là muốn xóa không?')"
+                                    class="btn btn-danger">Xóa</button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

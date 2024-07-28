@@ -11,7 +11,7 @@ class UpdateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,18 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'order_details.*.name' => 'required|max:150',
+            'order_details.*.price' => 'required|integer',
+            'order_details.*.quantity' => 'required|integer|min:1',
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'order_details.*.name' => 'Tên',
+            'order_details.*.price' => 'Giá',
+            'order_details.*.quantity' => 'Số Lượng Mua',
         ];
     }
 }
