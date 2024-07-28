@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Supplier;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
@@ -16,7 +20,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with(['customers, details'])->latest('id')->paginate(5);
+        $orders = Order::with(['customer', 'details'])->latest('id')->paginate(1);
 
         return view('admin.index', compact('orders'));
     }
@@ -32,42 +36,63 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-{
-    $customer = Customer::create($request->customer);
-    $supplier = Supplier::create($request->supplier);
+    public function store(StoreOrderRequest $request)
+    {
+        // dd($request->all());
 
-    $orderDetails = [];
-    $totalAmount = 0;
+        $images = [];
 
-    foreach ($request->products as $key => $product) {
-        $product['supplier_id'] = $supplier->id;
+        try {
+            DB::transaction(function () use ($request, &$images) {
+                $customer = Customer::create($request->customer);
+                $supplier = Supplier::create($request->supplier);
 
-        if ($request->hasFile("products.$key.image")) {
-            $product['image'] = Storage::put('products', $request->file("products.$key.image"));
+                $orderDetails = [];
+                $totalAmount = 0;
+                foreach ($request->products as $key => $product) {
+                    $product['supplier_id'] = $supplier->id;
+
+                    if ($request->hasFile("products.$key.image")) {
+                        // $images[] = $product['image'] = Storage::put('public/products', $request->file("products.$key.image"));
+
+                        $file = $request->file("products.$key.image");
+                        $fileName = time() . '_' . $file->getClientOriginalName();
+                        $images[] = $product['image'] = 'products/' . $fileName;
+                        Storage::putFileAs('public/products', $file, $fileName);
+                    }
+
+                    $tmp = Product::query()->create($product);
+
+                    $orderDetails[$tmp->id] = [
+                        'quantity' => $request->order_details[$key]['quantity'],
+                        'price' => $tmp->price
+                    ];
+
+                    $totalAmount += $request->order_details[$key]['quantity'] * $tmp->price;
+                }
+
+                $order = Order::query()->create([
+                    'customer_id' => $customer->id,
+                    'total' => $totalAmount,
+                ]);
+
+                $order->details()->attach($orderDetails);
+            }, 3);
+
+            return redirect()
+                ->route('orders.index')
+                ->with('success', 'Thêm Thành Công!');
+        } catch (Exception $exception) {
+
+            foreach ($images as $image) {
+                if (Storage::exists($image)) {
+                    Storage::delete($image);
+                }
+            }
+            log::error('Lỗi lưu đơn hàng: ' . $exception->getMessage());
+            return back()->with('error', $exception->getMessage());
         }
-
-        $tmp = Product::create($product);
-
-        $orderDetails[$tmp->id] = [
-            'quantity' => $request->order_details[$key]['quantity'],
-            'price' => $tmp->price
-        ];
-
-        $totalAmount += $request->order_details[$key]['quantity'] * $tmp->price;
     }
-
-    $order = Order::create([
-        'customer_id' => $customer->id,
-        'total' => $totalAmount,
-    ]);
-
-    $order->details()->attach($orderDetails);
-
-    return redirect()
-        ->route('orders.index')
-        ->with('success', 'Thao tác thành công!');
-}
 
     /**
      * Display the specified resource.

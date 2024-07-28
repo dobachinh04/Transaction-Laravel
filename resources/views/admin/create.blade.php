@@ -18,24 +18,40 @@
                     <div class="mb-3">
                         <label class="form-label">Họ và Tên</label>
                         <input type="text" class="form-control" name="customer[name]" value="{{ old('customer.name') }}">
+
+                        @error('customer.name')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Địa Chỉ</label>
                         <input type="text" class="form-control" name="customer[address]"
                             value="{{ old('customer.address') }}">
+
+                        @error('customer.address')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Số Điện Thoại</label>
                         <input type="text" class="form-control" name="customer[phone_number]"
                             value="{{ old('customer.phone_number') }}">
+
+                        @error('customer.phone_number')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="text" class="form-control" name="customer[email]"
                             value="{{ old('customer.email') }}">
+
+                        @error('customer.email')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -44,24 +60,40 @@
                     <div class="mb-3">
                         <label class="form-label">Họ và Tên</label>
                         <input type="text" class="form-control" name="supplier[name]" value="{{ old('supplier.name') }}">
+
+                        @error('supplier.name')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Địa Chỉ</label>
                         <input type="text" class="form-control" name="supplier[address]"
                             value="{{ old('supplier.address') }}">
+
+                        @error('supplier.address')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Số Điện Thoại</label>
                         <input type="text" class="form-control" name="supplier[phone_number]"
                             value="{{ old('supplier.phone_number') }}">
+
+                        @error('supplier.phone_number')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="text" class="form-control" name="supplier[email]"
                             value="{{ old('supplier.email') }}">
+
+                        @error('supplier.email')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -71,7 +103,7 @@
                 <table class="table table-bordered table-striped table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">Tên</th>
                             <th scope="col">Ảnh</th>
                             <th scope="col">Mô Tả</th>
                             <th scope="col">Giá</th>
@@ -86,47 +118,52 @@
                                     <input type="text" class="form-control" name="products[{{ $i }}][name]"
                                         value="{{ old("products.$i.name") }}">
 
-                                    {{-- @error("products.$i.name")
+                                    @error("products.$i.name")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
                                 <td>
                                     <input type="file" class="form-control" name="products[{{ $i }}][image]">
-                                    {{-- @error("products.$i.image")
+
+                                    @error("products.$i.image")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
                                 <td>
                                     <input type="text" class="form-control"
                                         name="products[{{ $i }}][description]"
                                         value="{{ old("products.$i.description") }}">
-                                    {{-- @error("products.$i.description")
+
+                                    @error("products.$i.description")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
                                 <td>
                                     <input type="number" class="form-control" name="products[{{ $i }}][price]"
                                         value="{{ old("products.$i.price") }}">
-                                    {{-- @error("products.$i.price")
+
+                                    @error("products.$i.price")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
                                 <td>
                                     <input type="number" class="form-control"
-                                        name="products[{{ $i }}][stock_qty]"
-                                        value="{{ old("products.$i.stock_qty") }}">
-                                    {{-- @error("products.$i.stock_qty")
+                                        name="products[{{ $i }}][stock_quantity]"
+                                        value="{{ old("products.$i.stock_quantity") }}">
+
+                                    @error("products.$i.stock_quantity")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
 
                                 <td>
                                     <input type="number" class="form-control"
                                         name="order_details[{{ $i }}][quantity]"
                                         value="{{ old("order_details.$i.quantity") }}">
-                                    {{-- @error("order_details.$i.quantity")
+
+                                    @error("order_details.$i.quantity")
                                         <span class="text-danger">{{ $message }}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </td>
                             </tr>
                         @endfor
