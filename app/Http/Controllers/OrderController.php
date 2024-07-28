@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -29,11 +33,41 @@ class OrderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $image = [];
+{
+    $customer = Customer::create($request->customer);
+    $supplier = Supplier::create($request->supplier);
 
+    $orderDetails = [];
+    $totalAmount = 0;
 
+    foreach ($request->products as $key => $product) {
+        $product['supplier_id'] = $supplier->id;
+
+        if ($request->hasFile("products.$key.image")) {
+            $product['image'] = Storage::put('products', $request->file("products.$key.image"));
+        }
+
+        $tmp = Product::create($product);
+
+        $orderDetails[$tmp->id] = [
+            'quantity' => $request->order_details[$key]['quantity'],
+            'price' => $tmp->price
+        ];
+
+        $totalAmount += $request->order_details[$key]['quantity'] * $tmp->price;
     }
+
+    $order = Order::create([
+        'customer_id' => $customer->id,
+        'total' => $totalAmount,
+    ]);
+
+    $order->details()->attach($orderDetails);
+
+    return redirect()
+        ->route('orders.index')
+        ->with('success', 'Thao tác thành công!');
+}
 
     /**
      * Display the specified resource.
